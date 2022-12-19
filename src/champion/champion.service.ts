@@ -1,4 +1,7 @@
-import { CreateChampionRateDto } from './../champion-rate/dto/create-champion-rate.dto';
+import {
+  CreateChampionRateDto,
+  CreateChampionRateResultDto,
+} from './../champion-rate/dto/create-champion-rate.dto';
 import { Injectable } from '@nestjs/common';
 import { CreateChampionDto } from './dto/create-champion.dto';
 import { UpdateChampionDto } from './dto/update-champion.dto';
@@ -34,7 +37,7 @@ export class ChampionService {
     const championRateList = [];
     const insertChampion = async () => {
       try {
-        for (let i = 1; i <= 5; i++) {
+        for (let i = 1; i <= 3; i++) {
           const html = await getHtml(i);
           if (!html) continue;
 
@@ -110,18 +113,20 @@ export class ChampionService {
     };
 
     await insertChampion();
-    // 3. db에 넣기
-    const campionResult = await this.championRateRepository.save(
+    const championResult = (await this.championRateRepository.save(
       championRateList,
-    );
+    )) as Array<Record<string, any>>;
+
+    // 3. db에 넣기
     for (let i = 0, length = championList.length; i < length; i++) {
+      championList[i].championRateName = championResult[i].id;
       await this.championRepository.upsert(championList, ['name']);
     }
     return 'This action adds a new champion';
   }
 
   findAll() {
-    return `This action returns all champion`;
+    return this.championRepository.find({ relations: ['championRateName'] });
   }
 
   findOne(id: number) {
