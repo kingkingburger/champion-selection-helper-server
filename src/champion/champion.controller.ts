@@ -30,6 +30,11 @@ export class ChampionController {
     return this.championService.findOne(+id);
   }
 
+  @Get('/name/:name')
+  findOneByName(@Param('name') name: string) {
+    return this.championService.findOneByName(name);
+  }
+
   @Patch(':id')
   update(
     @Param('id') id: string,

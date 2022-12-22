@@ -9,9 +9,10 @@ import axios from 'axios';
 import * as cheerio from 'cheerio';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Champion } from './entities/champion.entity';
-import { Repository } from 'typeorm';
+import { Repository, Equal } from 'typeorm';
 import { ChampionRateController } from '../champion-rate/champion-rate.controller';
 import { ChampionRate } from 'src/champion-rate/entities/champion-rate.entity';
+import { equal } from 'assert';
 
 @Injectable()
 export class ChampionService {
@@ -37,7 +38,7 @@ export class ChampionService {
     const championRateList = [];
     const insertChampion = async () => {
       try {
-        for (let i = 1; i <= 3; i++) {
+        for (let i = 1; i <= 1000; i++) {
           const html = await getHtml(i);
           if (!html) continue;
 
@@ -130,7 +131,19 @@ export class ChampionService {
   }
 
   findOne(id: number) {
-    return `This action returns a #${id} champion`;
+    const findChampionOne = this.championRepository.findOne({
+      where: { id: id },
+      relations: ['championRateName'],
+    });
+    return findChampionOne;
+  }
+
+  findOneByName(name: string) {
+    const findChampionOne = this.championRepository.find({
+      where: { name: name },
+      relations: ['championRateName'],
+    });
+    return findChampionOne;
   }
 
   update(id: number, updateChampionDto: UpdateChampionDto) {
