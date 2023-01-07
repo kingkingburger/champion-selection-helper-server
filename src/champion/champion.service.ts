@@ -1,18 +1,14 @@
-import {
-  CreateChampionRateDto,
-  CreateChampionRateResultDto,
-} from './../champion-rate/dto/create-champion-rate.dto';
 import { Injectable } from '@nestjs/common';
-import { CreateChampionDto } from './dto/create-champion.dto';
-import { UpdateChampionDto } from './dto/update-champion.dto';
+import { InjectRepository } from '@nestjs/typeorm';
 import axios from 'axios';
 import * as cheerio from 'cheerio';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Champion } from './entities/champion.entity';
-import { Repository, Equal } from 'typeorm';
-import { ChampionRateController } from '../champion-rate/champion-rate.controller';
 import { ChampionRate } from 'src/champion-rate/entities/champion-rate.entity';
-import { equal } from 'assert';
+import { Repository } from 'typeorm';
+
+import { CreateChampionRateDto } from './../champion-rate/dto/create-champion-rate.dto';
+import { CreateChampionDto } from './dto/create-champion.dto';
+import { UpdateChampionDto, dataInChampion } from './dto/update-champion.dto';
+import { Champion } from './entities/champion.entity';
 
 @Injectable()
 export class ChampionService {
@@ -152,5 +148,46 @@ export class ChampionService {
 
   remove(id: number) {
     return `This action removes a #${id} champion`;
+  }
+  async updateEngChampionName(updateChampionDto: UpdateChampionDto) {
+    const findAllChampionDB = await this.championRepository.find();
+
+    // 챔피언이름 : id로 딕셔너리 만들기
+    let originalDbData = [];
+    for (let champ in findAllChampionDB) {
+      const dbChampInfo = findAllChampionDB[champ];
+      originalDbData[dbChampInfo.name] = dbChampInfo.id;
+    }
+
+    // 1. fetch로 roit api 호출하기
+    const riotApiResponse = await fetch(
+      `https://ddragon.leagueoflegends.com/cdn/${updateChampionDto.version}/data/ko_KR/champion.json`,
+    );
+
+    let riotApiDataResult = [];
+    // 2. api 호출이 성공했을 때
+    if (riotApiResponse.ok) {
+      const data = (await riotApiResponse.json()) as Record<
+        string,
+        dataInChampion
+      >;
+      const fromRiotApiData = data.data;
+
+      // 챔피언이름 : engName 로 딕셔너리 만들기
+      for (let champ in fromRiotApiData) {
+        const champInfo: dataInChampion = fromRiotApiData[champ];
+        riotApiDataResult[champInfo.name] = champInfo.id;
+      }
+
+      for (let champ in originalDbData) {
+        await this.championRepository.update(
+          // db에 넣을 챔피언 이름, 가져온 name를 기준
+          { id: originalDbData[champ] },
+          // db에 넣을 engName들
+          { engName: riotApiDataResult[champ] },
+        );
+      }
+      return fromRiotApiData;
+    }
   }
 }

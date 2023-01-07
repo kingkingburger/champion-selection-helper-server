@@ -53,3 +53,9 @@ Nest is [MIT licensed](LICENSE).
 🟩 typeORM으로 select where문 만들기
 
 - id, name을 기준으로 fineOne 컨트롤러 생성
+
+## 🚀 0.0.2
+
+🟩 챔피언 영어이름 저장 api 생성 (POST /champion/sync/eng)
+
+- 기존 챔피언 이름을 기준으로 영어 이름 저장 update api 생성

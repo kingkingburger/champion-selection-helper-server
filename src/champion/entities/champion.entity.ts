@@ -20,6 +20,9 @@ export class Champion {
   @Column({ unique: true })
   name: string;
 
+  @Column()
+  engName: string;
+
   @CreateDateColumn()
   createdAt: Date;
   @UpdateDateColumn()

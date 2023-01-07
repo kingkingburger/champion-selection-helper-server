@@ -1,5 +1,4 @@
 import { ChampionRate } from 'src/champion-rate/entities/champion-rate.entity';
-// import { ChampionRepository } from "./repository/champion.repository";
 import { Champion } from './entities/champion.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Module } from '@nestjs/common';

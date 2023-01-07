@@ -35,6 +35,11 @@ export class ChampionController {
     return this.championService.findOneByName(name);
   }
 
+  @Post('/sync/eng')
+  settingEngName(@Body() updateChampionDto: UpdateChampionDto) {
+    return this.championService.updateEngChampionName(updateChampionDto);
+  }
+
   @Patch(':id')
   update(
     @Param('id') id: string,
