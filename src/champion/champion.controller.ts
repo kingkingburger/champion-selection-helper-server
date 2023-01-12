@@ -6,12 +6,12 @@ import {
   Patch,
   Param,
   Delete,
-} from '@nestjs/common';
-import { ChampionService } from './champion.service';
-import { CreateChampionDto } from './dto/create-champion.dto';
-import { UpdateChampionDto } from './dto/update-champion.dto';
+} from "@nestjs/common";
+import { ChampionService } from "./champion.service";
+import { CreateChampionDto } from "./dto/create-champion.dto";
+import { UpdateChampionDto } from "./dto/update-champion.dto";
 
-@Controller('champion')
+@Controller("champion")
 export class ChampionController {
   constructor(private readonly championService: ChampionService) {}
 
@@ -19,37 +19,41 @@ export class ChampionController {
   create() {
     return this.championService.create();
   }
+  @Post("/riot")
+  createWithRiot() {
+    return this.championService.initRiotApi();
+  }
 
   @Get()
   findAll() {
     return this.championService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
+  @Get(":id")
+  findOne(@Param("id") id: string) {
     return this.championService.findOne(+id);
   }
 
-  @Get('/name/:name')
-  findOneByName(@Param('name') name: string) {
+  @Get("/name/:name")
+  findOneByName(@Param("name") name: string) {
     return this.championService.findOneByName(name);
   }
 
-  @Post('/sync/eng')
+  @Post("/sync/eng")
   settingEngName(@Body() updateChampionDto: UpdateChampionDto) {
     return this.championService.updateEngChampionName(updateChampionDto);
   }
 
-  @Patch(':id')
+  @Patch(":id")
   update(
-    @Param('id') id: string,
-    @Body() updateChampionDto: UpdateChampionDto,
+    @Param("id") id: string,
+    @Body() updateChampionDto: UpdateChampionDto
   ) {
     return this.championService.update(+id, updateChampionDto);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
+  @Delete(":id")
+  remove(@Param("id") id: string) {
     return this.championService.remove(+id);
   }
 }

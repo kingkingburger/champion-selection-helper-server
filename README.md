@@ -59,3 +59,9 @@ Nest is [MIT licensed](LICENSE).
 🟩 챔피언 영어이름 저장 api 생성 (POST /champion/sync/eng)
 
 - 기존 챔피언 이름을 기준으로 영어 이름 저장 update api 생성
+
+## 🚀 0.0.3
+
+🟩 변화된 화면에 따른 크롤링 방식 변경
+
+🟩 크롤링 로직 속도증가

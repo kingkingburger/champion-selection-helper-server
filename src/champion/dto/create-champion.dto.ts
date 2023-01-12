@@ -1,7 +1,8 @@
 export class CreateChampionDto {
-  champNumber: number;
+  key: number;
   name: string;
-  championRateName?: number;
+  championRateName?: number | null;
+  engName?: string | null;
   // worst1Name: string;
   // worst2Name: string;
   // worst3Name: string;

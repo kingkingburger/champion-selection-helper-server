@@ -5,14 +5,14 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
-  OneToOne,
-} from 'typeorm';
+  OneToOne
+} from "typeorm";
 
 @Entity()
 export class ChampionRate {
   @PrimaryGeneratedColumn()
   id: number;
-  @Column()
+  @Column({ unique: true })
   name: string;
 
   @Column()
