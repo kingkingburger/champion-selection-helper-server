@@ -19,6 +19,19 @@ export class ChampionService {
     private readonly championRateRepository: Repository<ChampionRate>
   ) {}
 
+    // [riot 최신 version을 가져오기] 위한 api 호출
+    getRiotVersion = async () => {
+      try {
+        const result = await axios.get(`https://ddragon.leagueoflegends.com/api/versions.json`)
+        return result.data[0];
+      } catch (err) {
+        return new Promise((resolve, reject) => {
+          return reject(err);
+        })
+      }
+    }
+
+
   async create() {
     // 1. lol.ps 챔피언 별로 가지고 오기
     const getHtml = async (championNumber: number) => {
@@ -46,7 +59,7 @@ export class ChampionService {
           originalDbDataByKey[dbChampInfo.key] = dbChampInfo;
         }
 
-        // key = 크롤링할 챔피언의 고유키
+        // [챔피언 key 사이의 간극을 줄이기 위한] 챔피언의 key별로 for문 순회
         for (const championOwnKey in findAllChampionDB) {
           const key = findAllChampionDB[championOwnKey].key;
           const html = await getHtml(key);
@@ -58,11 +71,10 @@ export class ChampionService {
             .map((i, el) => $(el).html())
             .get();
 
+          // 크롤링 데이터를 가공
           const scriptContentObject = JSON.parse(scriptContents[5]);
           const scriptContentObjectInData = scriptContentObject[3] as Record<string, any>;
           const scriptCoreDataObject: scriptContentObjectInData = scriptContentObjectInData.data;
-          // 챔피언 번호가 비어있다면 다음 챔피언으로
-          if (!scriptCoreDataObject.champSummary) continue;
 
           // 챔피언의 능력치가 모두 들어가있는 코어 객체
           const ChampionSummaryObject: champSummaryData = scriptCoreDataObject.champSummary[0];
@@ -130,7 +142,7 @@ export class ChampionService {
 
           // 3. championRate 테이블에 값을 넣어주고 chapion 테이블에 pk 연관관계 처리해주기
           const rateTableResult = await this.championRateRepository.upsert(championRateInsertParam, ["name"]);
-          const syncTable = await this.championRepository.update(originalDbDataByName[championRateInsertParam.name], {
+          await this.championRepository.update(originalDbDataByName[championRateInsertParam.name], {
             championRateName: rateTableResult.raw[0].id
           });
         }
@@ -147,10 +159,14 @@ export class ChampionService {
 
   // riot api를 이용해서 챔피언 이름, 영어이름, 고유 키 db에 저장하기 위함
   async initRiotApi() {
+
+
+
     // riot api 가져오기
     const getRiotApi = async () => {
       try {
-        const result = await axios.get(`https://ddragon.leagueoflegends.com/cdn/13.1.1/data/ko_KR/champion.json`);
+        const version = await this.getRiotVersion()
+        const result = await axios.get(`https://ddragon.leagueoflegends.com/cdn/${version}/data/ko_KR/champion.json`);
         return result.data.data;
       } catch (err) {
         return new Promise((resolve, reject) => {
