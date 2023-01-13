@@ -19,18 +19,17 @@ export class ChampionService {
     private readonly championRateRepository: Repository<ChampionRate>
   ) {}
 
-    // [riot 최신 version을 가져오기] 위한 api 호출
-    getRiotVersion = async () => {
-      try {
-        const result = await axios.get(`https://ddragon.leagueoflegends.com/api/versions.json`)
-        return result.data[0];
-      } catch (err) {
-        return new Promise((resolve, reject) => {
-          return reject(err);
-        })
-      }
+  // [riot 최신 version을 가져오기] 위한 api 호출
+  getRiotVersion = async () => {
+    try {
+      const result = await axios.get(`https://ddragon.leagueoflegends.com/api/versions.json`);
+      return result.data[0];
+    } catch (err) {
+      return new Promise((resolve, reject) => {
+        return reject(err);
+      });
     }
-
+  };
 
   async create() {
     // 1. lol.ps 챔피언 별로 가지고 오기
@@ -159,13 +158,10 @@ export class ChampionService {
 
   // riot api를 이용해서 챔피언 이름, 영어이름, 고유 키 db에 저장하기 위함
   async initRiotApi() {
-
-
-
     // riot api 가져오기
     const getRiotApi = async () => {
       try {
-        const version = await this.getRiotVersion()
+        const version = await this.getRiotVersion();
         const result = await axios.get(`https://ddragon.leagueoflegends.com/cdn/${version}/data/ko_KR/champion.json`);
         return result.data.data;
       } catch (err) {
@@ -194,6 +190,11 @@ export class ChampionService {
 
   findAll() {
     return this.championRepository.find({ relations: ["championRateName"] });
+  }
+
+  // [riot 최신 version을 가져오기] 위한 api 호출
+  getVersion() {
+    return this.getRiotVersion();
   }
 
   findOne(id: number) {

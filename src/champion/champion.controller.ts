@@ -1,12 +1,4 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-} from "@nestjs/common";
+import { Controller, Get, Post, Body, Patch, Param, Delete } from "@nestjs/common";
 import { ChampionService } from "./champion.service";
 import { CreateChampionDto } from "./dto/create-champion.dto";
 import { UpdateChampionDto } from "./dto/update-champion.dto";
@@ -28,6 +20,10 @@ export class ChampionController {
   findAll() {
     return this.championService.findAll();
   }
+  @Get("/version")
+  version() {
+    return this.championService.getVersion();
+  }
 
   @Get(":id")
   findOne(@Param("id") id: string) {
@@ -45,10 +41,7 @@ export class ChampionController {
   }
 
   @Patch(":id")
-  update(
-    @Param("id") id: string,
-    @Body() updateChampionDto: UpdateChampionDto
-  ) {
+  update(@Param("id") id: string, @Body() updateChampionDto: UpdateChampionDto) {
     return this.championService.update(+id, updateChampionDto);
   }
 

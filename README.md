@@ -69,3 +69,7 @@ Nest is [MIT licensed](LICENSE).
 ## 🚀 0.0.4
 
 🟩 최신버전의 riot api를 가져오는 로직 추가
+
+## 🚀 0.0.5
+
+🟩 riot api의 최신버전을 반환하는 api 생성
