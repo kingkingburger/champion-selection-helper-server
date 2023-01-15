@@ -47,6 +47,7 @@ export class ChampionService {
     };
 
     const insertChampion = async () => {
+      const lineArray = ["top", "jungle", "mid", "ad", "sup"];
       try {
         // [db조회를 1번만 하기 위한] 챔피언이름 : id로 딕셔너리 만들기
         const findAllChampionDB = await this.championRepository.find();
@@ -62,7 +63,6 @@ export class ChampionService {
         for (const championOwnKey in findAllChampionDB) {
           const key = findAllChampionDB[championOwnKey].key;
           const html = await getHtml(key);
-          if (!html) continue;
 
           // 2. 챔피언별 어려운상대, 쉬운상대 3개 뽑기
           const $ = cheerio.load(html);
@@ -142,7 +142,8 @@ export class ChampionService {
           // 3. championRate 테이블에 값을 넣어주고 chapion 테이블에 pk 연관관계 처리해주기
           const rateTableResult = await this.championRateRepository.upsert(championRateInsertParam, ["name"]);
           await this.championRepository.update(originalDbDataByName[championRateInsertParam.name], {
-            championRateName: rateTableResult.raw[0].id
+            championRateName: rateTableResult.raw[0].id,
+            line: lineArray[ChampionSummaryObject.top1LaneId]
           });
         }
       } catch (err) {

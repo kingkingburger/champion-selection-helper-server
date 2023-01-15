@@ -18,11 +18,14 @@ export class Champion {
   @Column()
   key: number; // 챔피언 고유의 id
 
-  @Column({unique:true})
+  @Column({ unique: true })
   name: string;
 
   @Column()
   engName: string;
+
+  @Column({ default: "" })
+  line: string;
 
   @CreateDateColumn()
   createdAt: Date;

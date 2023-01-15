@@ -20,6 +20,7 @@ export class ChampionController {
   findAll() {
     return this.championService.findAll();
   }
+
   @Get("/version")
   version() {
     return this.championService.getVersion();
