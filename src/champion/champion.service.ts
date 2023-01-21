@@ -47,7 +47,7 @@ export class ChampionService {
     };
 
     const insertChampion = async () => {
-      const lineArray = ["top", "jungle", "mid", "ad", "sup"];
+      const lineArray = ["top", "jug", "mid", "ad", "sup"];
       try {
         // [db조회를 1번만 하기 위한] 챔피언이름 : id로 딕셔너리 만들기
         const findAllChampionDB = await this.championRepository.find();
