@@ -36,6 +36,11 @@ export class ChampionController {
     return this.championService.findOneByName(name);
   }
 
+  @Get("/line/:line")
+  findOtherLine(@Param("line") line: string) {
+    return this.championService.findOtherLine(line);
+  }
+
   @Post("/sync/eng")
   settingEngName(@Body() updateChampionDto: UpdateChampionDto) {
     return this.championService.updateEngChampionName(updateChampionDto);

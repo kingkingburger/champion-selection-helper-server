@@ -3,6 +3,7 @@ export class CreateChampionDto {
   name: string;
   championRateName?: number | null;
   engName?: string | null;
+  img?: string | null;
   // worst1Name: string;
   // worst2Name: string;
   // worst3Name: string;

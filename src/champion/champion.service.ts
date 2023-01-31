@@ -5,10 +5,11 @@ import { InjectRepository } from "@nestjs/typeorm";
 import axios from "axios";
 import * as cheerio from "cheerio";
 import { ChampionRate } from "src/champion-rate/entities/champion-rate.entity";
-import { Repository } from "typeorm";
+import { Repository, Not } from "typeorm";
 
 import { dataInChampion, UpdateChampionDto } from "./dto/update-champion.dto";
 import { Champion, scriptContentObjectInData, champSummaryData } from "./entities/champion.entity";
+import { rejects } from "assert";
 
 @Injectable()
 export class ChampionService {
@@ -154,39 +155,47 @@ export class ChampionService {
     };
 
     await insertChampion();
-    return "This action adds a new champion";
+    return "크롤링 데이터 입력 성공";
   }
 
   // riot api를 이용해서 챔피언 이름, 영어이름, 고유 키 db에 저장하기 위함
   async initRiotApi() {
-    // riot api 가져오기
-    const getRiotApi = async () => {
-      try {
-        const version = await this.getRiotVersion();
-        const result = await axios.get(`https://ddragon.leagueoflegends.com/cdn/${version}/data/ko_KR/champion.json`);
-        return result.data.data;
-      } catch (err) {
-        return new Promise((resolve, reject) => {
-          reject(err);
-        });
-      }
-    };
+    try {
+      // riot api 가져오기
+      const getRiotApi = async () => {
+        try {
+          const version = await this.getRiotVersion();
+          const result = await axios.get(`https://ddragon.leagueoflegends.com/cdn/${version}/data/ko_KR/champion.json`);
+          return result.data.data;
+        } catch (err) {
+          return new Promise((resolve, reject) => {
+            reject(err);
+          });
+        }
+      };
 
-    const useriotApiInsertChampionInfo = async () => {
-      const riotApi = await getRiotApi();
-      for (const championName in riotApi) {
-        // 챔피언의 이름별로 key, name, engName 등록하기
-        const riotApiChampionResponse: dataInChampion = riotApi[championName];
-        const insertedChampionParam: CreateChampionDto = {
-          key: Number(riotApiChampionResponse.key),
-          name: riotApiChampionResponse.name,
-          engName: championName
-        };
-        await this.championRepository.upsert(insertedChampionParam, ["name"]);
-      }
-    };
-    // 라이엇 api를 이용해서 db에 값을 저장하기
-    await useriotApiInsertChampionInfo();
+      const useriotApiInsertChampionInfo = async () => {
+        const riotApi = await getRiotApi();
+        for (const championName in riotApi) {
+          // 챔피언의 이름별로 key, name, engName 등록하기
+          const riotApiChampionResponse: dataInChampion = riotApi[championName];
+          const insertedChampionParam: CreateChampionDto = {
+            key: Number(riotApiChampionResponse.key),
+            name: riotApiChampionResponse.name,
+            engName: championName,
+            img: `http://ddragon.leagueoflegends.com/cdn/${riotApiChampionResponse.version}/img/champion/${riotApiChampionResponse.image.full}`
+          };
+          await this.championRepository.upsert(insertedChampionParam, ["name"]);
+        }
+      };
+      // 라이엇 api를 이용해서 db에 값을 저장하기
+      await useriotApiInsertChampionInfo();
+      return `라이엇 api 입력 성공`;
+    } catch (err) {
+      return new Promise((rejects) => {
+        return rejects(err);
+      });
+    }
   }
 
   findAll() {
@@ -214,6 +223,38 @@ export class ChampionService {
     return findChampionOne;
   }
 
+  // 배열의 랜덤한 element를 반환
+  getRandomElement<T>(arr: Array<T>): T {
+    return arr[Math.floor(Math.random() * arr.length)];
+  }
+
+  // 4개의 챔피언 추천(라인별)
+  async findOtherLine(line: string) {
+    const result: Array<Champion> = [];
+    const fourOtherLine = await this.championRepository.findBy({ line: Not(line) });
+
+    const fourLineArray = ["top", "jug", "mid", "ad", "sup"].filter((value) => value !== line);
+
+    const championArray1: Array<Champion> = [];
+    const championArray2: Array<Champion> = [];
+    const championArray3: Array<Champion> = [];
+    const championArray4: Array<Champion> = [];
+
+    const allChampionArray = [championArray1, championArray2, championArray3, championArray4];
+
+    for (const champion of fourOtherLine) {
+      if (champion.line === fourLineArray[0]) allChampionArray[0].push(champion);
+      if (champion.line === fourLineArray[1]) allChampionArray[1].push(champion);
+      if (champion.line === fourLineArray[2]) allChampionArray[2].push(champion);
+      if (champion.line === fourLineArray[3]) allChampionArray[3].push(champion);
+    }
+
+    for (let i = 0; i < 4; i++) {
+      result.push(this.getRandomElement(allChampionArray[i]));
+    }
+    return result;
+  }
+
   update(id: number, updateChampionDto: UpdateChampionDto) {
     return `This action updates a #${id} champion`;
   }
@@ -221,6 +262,7 @@ export class ChampionService {
   remove(id: number) {
     return `This action removes a #${id} champion`;
   }
+
   //챔피언 영어 이름을 업데이트하기위함
   async updateEngChampionName(updateChampionDto: UpdateChampionDto) {
     const findAllChampionDB = await this.championRepository.find();

@@ -81,3 +81,9 @@ Nest is [MIT licensed](LICENSE).
 ## 🚀 0.0.7
 
 🟦 챔피언 라인 jungle -> jug 이름변경
+
+## 🚀 0.0.8
+
+🟦 랜덤한 챔피언 라인별로 추천api 생성
+
+- GET /champion/line/<:line>
