@@ -87,3 +87,7 @@ Nest is [MIT licensed](LICENSE).
 🟦 랜덤한 챔피언 라인별로 추천api 생성
 
 - GET /champion/line/<:line>
+
+## 🚀 0.0.9
+
+🟦 테스트코드 활성화를 위한 수정

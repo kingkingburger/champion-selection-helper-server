@@ -7,11 +7,12 @@ import {
   JoinColumn,
   OneToOne,
   PrimaryGeneratedColumn,
-  UpdateDateColumn
+  UpdateDateColumn,
+  BaseEntity
 } from "typeorm";
 
 @Entity()
-export class Champion {
+export class Champion extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -26,6 +27,9 @@ export class Champion {
 
   @Column({ default: "" })
   line: string;
+
+  @Column()
+  img: string;
 
   @CreateDateColumn()
   createdAt: Date;

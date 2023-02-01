@@ -4,12 +4,11 @@ import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import axios from "axios";
 import * as cheerio from "cheerio";
-import { ChampionRate } from "src/champion-rate/entities/champion-rate.entity";
-import { Repository, Not } from "typeorm";
+import { Not, Repository } from "typeorm";
 
 import { dataInChampion, UpdateChampionDto } from "./dto/update-champion.dto";
-import { Champion, scriptContentObjectInData, champSummaryData } from "./entities/champion.entity";
-import { rejects } from "assert";
+import { Champion, champSummaryData, scriptContentObjectInData } from "./entities/champion.entity";
+import { ChampionRate } from "../champion-rate/entities/champion-rate.entity";
 
 @Injectable()
 export class ChampionService {
@@ -231,7 +230,7 @@ export class ChampionService {
   // 4개의 챔피언 추천(라인별)
   async findOtherLine(line: string) {
     const result: Array<Champion> = [];
-    const fourOtherLine = await this.championRepository.findBy({ line: Not(line) });
+    const fourOtherLine = await Champion.findBy({ line: Not(line) });
 
     const fourLineArray = ["top", "jug", "mid", "ad", "sup"].filter((value) => value !== line);
 

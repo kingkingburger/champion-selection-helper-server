@@ -1,15 +1,7 @@
-import {
-  Column,
-  CreateDateColumn,
-  DeleteDateColumn,
-  Entity,
-  PrimaryGeneratedColumn,
-  UpdateDateColumn,
-  OneToOne
-} from "typeorm";
+import { BaseEntity, Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
-export class ChampionRate {
+export class ChampionRate extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
   @Column({ unique: true })
