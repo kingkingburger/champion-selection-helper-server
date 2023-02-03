@@ -11,7 +11,6 @@ import { Champion } from "./champion/entities/champion.entity";
 @Module({
   imports: [
     TypeOrmModule.forRoot(TypeOrmConfig), // TypeORM 설정파일 연결
-    TypeOrmModule.forFeature([Champion]),
     UserModule,
     ChampionModule,
     ChampionRateModule
